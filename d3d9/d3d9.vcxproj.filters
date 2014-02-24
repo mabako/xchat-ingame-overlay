@@ -30,15 +30,15 @@
     <ClCompile Include="..\dinput8\di8.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="d3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="chat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\receiver.h">
@@ -51,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\dinput8\di8device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

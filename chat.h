@@ -5,10 +5,11 @@
 
 #include <string>
 #include <deque>
+#include <vector>
 
 #pragma comment(lib, "d3dx9.lib")
 
-#include "../receiver.h"
+#include "receiver.h"
 
 class Chatbox : public Target
 {
@@ -18,26 +19,28 @@ private:
 	Receiver r;
 
 	std::deque<std::string> messages;
-	bool active;
+	
+	std::vector<std::string> channels;
+	int active;
+
+	std::string input;
 
 public:
 	Chatbox()
 	{
 		font = nullptr;
 
-		messages.push_back("irc overlay");
-		messages.push_back("welcoem");
+		channels.push_back("#banished");
+		channels.push_back("#mabako");
 
-		active = false;
+		messages.push_back("IRC Overlay");
+
+		active = -1;
 	}
 
 	~Chatbox()
 	{
-		if (font)
-		{
-			font->Release();
-			delete font;
-		}
+		OnDestroyDevice();
 	}
 
 	void OnCreateDevice(IDirect3DDevice9* pDevice)
@@ -58,6 +61,15 @@ public:
 			font->OnResetDevice();
 	}
 
+	void OnDestroyDevice()
+	{
+		if (font)
+		{
+			font->Release();
+			delete font;
+		}
+	}
+
 	void OnMessage(std::string& username, std::string& message)
 	{
 		messages.push_back(username + ": " + message);
@@ -67,7 +79,7 @@ public:
 
 	void Render()
 	{
-		if (font && r.CheckWindow())
+		if (font && GetActiveWindow() != NULL && r.CheckWindow())
 		{
 			RECT rect;
 			rect.left = 10;
@@ -84,17 +96,74 @@ public:
 
 				Draw(message.c_str(), rect);
 			}
+
+			if (IsActive())
+			{
+				rect.top += 25;
+				rect.bottom += 25;
+
+				Draw((channels[active] + " > " + input + "_").c_str(), rect);
+			}
 		}
 	}
 
-	bool IsActive()
+	bool OnChar(char c)
 	{
-		return active;
+		if (c == VK_TAB && !IsActive())
+		{
+			Toggle();
+			input.clear();
+		}
+		else if (IsActive())
+		{
+			switch (c)
+			{
+			case VK_TAB:
+				++active;
+				if (active == channels.size())
+					active = -1;
+				break;
+
+			case VK_RETURN:
+				if (input.size() > 0)
+					r.Push(channels[active], input);
+
+				/* fall through */
+			case VK_ESCAPE:
+				active = -1;
+				input.clear();
+				break;
+
+			case VK_BACK:
+				if (input.size() > 0)
+				{
+					input.erase(input.size() - 1);
+				}
+				break;
+
+			default:
+				if (input.size() < MAX_MESSAGE_LENGTH - 2 && c >= ' ')
+				{
+					input += c;
+				}
+				else
+					return false;
+			}
+		}
+		return true;
+	}
+
+	inline bool IsActive()
+	{
+		return active >= 0;
 	}
 
 	void Toggle()
 	{
-		active = !active;
+		if (active < 0)
+			active = 0;
+		else
+			active = -1;
 	}
 
 private:
@@ -117,5 +186,4 @@ private:
 
 		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 255, 255, 255));
 	}
-
 };

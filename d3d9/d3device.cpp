@@ -1,12 +1,13 @@
 #include "d3device.h"
-#include "chat.h"
+#include "../chat.h"
 
 Chatbox chat;
 
-Direct3DDevice9Proxy::Direct3DDevice9Proxy(IDirect3D9* pD3D, IDirect3DDevice9* pDevice)
+Direct3DDevice9Proxy::Direct3DDevice9Proxy(IDirect3D9* pD3D, IDirect3DDevice9* pDevice, Window* window)
 {
 	m_pD3D = pD3D;
 	m_pD3DDevice = pDevice;
+	m_pWindow = window;
 
 	chat.OnCreateDevice(pDevice);
 }
@@ -26,7 +27,11 @@ ULONG STDMETHODCALLTYPE Direct3DDevice9Proxy::Release()
 	ULONG uRet = m_pD3DDevice->Release();
 
 	if (uRet == 0)
+	{
+		chat.OnDestroyDevice();
+		delete m_pWindow;
 		delete this;
+	}
 
 	return uRet;
 }
@@ -109,7 +114,9 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pP
 	HRESULT hResult = m_pD3DDevice->Reset(pPresentationParameters);
 
 	if (SUCCEEDED(hResult))
+	{
 		chat.OnResetDevice();
+	}
 
 	return hResult;
 }

@@ -86,7 +86,7 @@ public:
 			return false;
 
 		SMSDataStruct* pPushMap = (SMSDataStruct*)MapViewOfFile(hPushMapping, FILE_MAP_WRITE, 0, 0, 0);
-		strcpy_s(pPushMap->user, MAX_USER_LENGTH, text.c_str());
+		strcpy_s(pPushMap->user, MAX_USER_LENGTH, channel.c_str());
 		strcpy_s(pPushMap->message, MAX_MESSAGE_LENGTH, text.c_str());
 
 		LRESULT value = SendMessage(hWnd, WM_PUSH, 0, 0);

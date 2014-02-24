@@ -15,6 +15,7 @@
 
 #include "d3.h"
 #include "../dinput8/di8.h"
+#include "../window.h"
 
 /* dinput8 has no explicit typedef like dx has */
 typedef HRESULT(WINAPI *DirectInput8Create_TYPE)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);

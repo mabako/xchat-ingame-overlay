@@ -1,5 +1,6 @@
 #include "d3.h"
 #include "d3device.h"
+#include "../window.h"
 
 Direct3D9Proxy::Direct3D9Proxy(IDirect3D9* pD3D)
 {
@@ -100,7 +101,7 @@ HRESULT STDMETHODCALLTYPE Direct3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE 
 	// If creation of the d3d device succeeded call the create device client event and create the proxy device
 	if (SUCCEEDED(hr))
 	{
-		*ppReturnedDeviceInterface = new Direct3DDevice9Proxy(this, *ppReturnedDeviceInterface);
+		*ppReturnedDeviceInterface = new Direct3DDevice9Proxy(this, *ppReturnedDeviceInterface, new Window(hFocusWindow));
 	}
 
 	return hr;

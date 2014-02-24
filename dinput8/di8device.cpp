@@ -1,7 +1,7 @@
 #include "di8device.h"
 #include <dinput.h>
 
-#include "../d3d9/chat.h"
+#include "../chat.h"
 
 extern Chatbox chat;
 

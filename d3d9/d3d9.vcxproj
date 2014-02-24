@@ -75,9 +75,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,16 +146,18 @@
   <ItemGroup>
     <ClCompile Include="..\dinput8\di8.cpp" />
     <ClCompile Include="..\dinput8\di8device.cpp" />
+    <ClCompile Include="..\window.cpp" />
     <ClCompile Include="d3.cpp" />
     <ClCompile Include="d3device.cpp" />
     <ClCompile Include="proxy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\multIV\Vendor\detours\detours.h" />
+    <ClInclude Include="..\chat.h" />
     <ClInclude Include="..\dinput8\di8.h" />
     <ClInclude Include="..\dinput8\di8device.h" />
     <ClInclude Include="..\receiver.h" />
-    <ClInclude Include="chat.h" />
+    <ClInclude Include="..\window.h" />
     <ClInclude Include="d3.h" />
     <ClInclude Include="d3device.h" />
   </ItemGroup>

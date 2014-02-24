@@ -1,15 +1,17 @@
 #pragma once
 
 #include <d3d9.h>
+#include "../window.h"
 
 class Direct3DDevice9Proxy : public IDirect3DDevice9
 {
 private:
 	IDirect3D9*       m_pD3D;
 	IDirect3DDevice9* m_pD3DDevice;
+	Window*           m_pWindow;
 
 public:
-	Direct3DDevice9Proxy(IDirect3D9* pD3D, IDirect3DDevice9* pDevice);
+	Direct3DDevice9Proxy(IDirect3D9* pD3D, IDirect3DDevice9* pDevice, Window* window);
 
 	/*** IUnknown methods ***/
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void ** ppvObj);
