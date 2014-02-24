@@ -12,6 +12,8 @@
 
 #define PUSH_MAPPING_NAME "{xlay_push}"
 
+#define DIRECTINPUT_VERSION 0x0800
+
 
 #define MAX_USER_LENGTH 34
 #define MAX_MESSAGE_LENGTH (512 - MAX_USER_LENGTH)

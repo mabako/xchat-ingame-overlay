@@ -14,9 +14,11 @@ class Chatbox : public Target
 {
 private:
 	ID3DXFont* font;
+
 	Receiver r;
 
 	std::deque<std::string> messages;
+	bool active;
 
 public:
 	Chatbox()
@@ -25,6 +27,8 @@ public:
 
 		messages.push_back("irc overlay");
 		messages.push_back("welcoem");
+
+		active = false;
 	}
 
 	~Chatbox()
@@ -66,20 +70,52 @@ public:
 		if (font && r.CheckWindow())
 		{
 			RECT rect;
-			rect.left = 15;
-			rect.right = 800;
+			rect.left = 10;
+			rect.right = 1920;
 			rect.top = -5;
 			rect.bottom = 10;
 
 			r.Poll(this);
 
-			for (const std::string message : messages)
+			for (const std::string& message : messages)
 			{
 				rect.top += 15;
 				rect.bottom += 15;
 
-				font->DrawText(NULL, message.c_str(), -1, &rect, 0, D3DCOLOR_ARGB(255, 255, 255, 255));
+				Draw(message.c_str(), rect);
 			}
 		}
 	}
+
+	bool IsActive()
+	{
+		return active;
+	}
+
+	void Toggle()
+	{
+		active = !active;
+	}
+
+private:
+	/* Draws a message with a black border around it */
+	void Draw(const char* message, RECT& rect)
+	{
+		rect.left--;
+		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 0, 0, 0));
+
+		rect.left += 2;
+		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 0, 0, 0));
+
+		rect.left--;
+		rect.top--;
+		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 0, 0, 0));
+
+		rect.top += 2;
+		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 0, 0, 0));
+		rect.top--;
+
+		font->DrawText(NULL, message, -1, &rect, 0, D3DCOLOR_ARGB(255, 255, 255, 255));
+	}
+
 };

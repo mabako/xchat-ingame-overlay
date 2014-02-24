@@ -1,0 +1,4 @@
+[submodule "vendor/minhook"]
+	path = vendor/minhook
+	url = https://github.com/elitak/minhook
+	branch = master

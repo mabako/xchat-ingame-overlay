@@ -1,12 +1,26 @@
-// proxydll.cpp
 #include "../common.h"
 #include "../receiver.h"
 
+#include "../vendor/minhook/include/MinHook.h"
+#ifdef _WIN64
+	#pragma comment(lib, "../vendor/minhook/lib/libMinHook.x64.lib")
+#else
+	#pragma comment(lib, "../vendor/minhook/lib/libMinHook.x86.lib")
+#endif
+
 #include <d3d9.h>
+#include <dinput.h>
 #include <Windows.h>
+#include <assert.h>
 
 #include "d3.h"
+#include "../dinput8/di8.h"
 
+/* dinput8 has no explicit typedef like dx has */
+typedef HRESULT(WINAPI *DirectInput8Create_TYPE)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
+DirectInput8Create_TYPE DirectInput8Create_fn = nullptr;
+
+/* d3d9.dll */
 HINSTANCE hOriginalDll = NULL;
 
 void LoadOriginalDll(void)
@@ -58,12 +72,43 @@ void ExitInstance()
 	}
 }
 
+HRESULT WINAPI DirectInput8Create_Hook(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
+{
+	// Call the real 'DirectInput8Create'
+	HRESULT hr = DirectInput8Create_fn(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+
+	// If the call succeeded create our proxy device
+	if (SUCCEEDED(hr))
+	{
+		IDirectInput8 * pDInput = (IDirectInput8 *)*ppvOut;
+		*ppvOut = new DirectInput8Proxy(pDInput);
+	}
+
+	return hr;
+}
+
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
 {
 	switch (fdwReason)
 	{
+	case DLL_PROCESS_ATTACH:
+	{
+		MH_Initialize();
+
+		if (GetModuleHandle("dinput8.dll") == NULL)
+			LoadLibrary("dinput8.dll");
+
+		MH_CreateHook(GetProcAddress(GetModuleHandle("dinput8.dll"), "DirectInput8Create"), &DirectInput8Create_Hook, reinterpret_cast<void**>(&DirectInput8Create_fn));
+
+		MH_EnableHook(MH_ALL_HOOKS);
+	}
+		break;
+
 	case DLL_PROCESS_DETACH:
 		ExitInstance();
+
+		MH_Uninitialize();
+
 		break;
 	}
 	return TRUE;
