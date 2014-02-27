@@ -26,8 +26,6 @@ public:
 
 		/* set our own window proc to handle things from here on out */
 		SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)Hook);
-
-		chat.OnMessage(std::string("debug"), std::string("hi"));
 	}
 
 	~Window()
@@ -37,8 +35,6 @@ public:
 
 		/* and remove the self reference */
 		windows.erase(hwnd);
-
-		chat.OnMessage(std::string("debug"), std::string("bye"));
 	}
 
 

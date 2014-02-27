@@ -58,7 +58,7 @@ int handle_push()
 	xchat_context* oldctx = xchat_get_context(ph);
 
 	/* find the target */
-	xchat_context* ctx = xchat_find_context(ph, NULL, pPushMap->user);
+	xchat_context* ctx = xchat_find_context(ph, NULL, pPushMap->channel);
 	if (ctx == NULL)
 	{
 		xchat_print(ph, "Missing Context to write to.");
@@ -69,7 +69,10 @@ int handle_push()
 	if (xchat_set_context(ph, ctx))
 	{
 		/* output a single one-liner */
-		xchat_commandf(ph, "SAY %s", pPushMap->message);
+		if (pPushMap->action == ACTION_ME)
+			xchat_commandf(ph, "ME %s", pPushMap->message);
+		else if (pPushMap->action == ACTION_SAY)
+			xchat_commandf(ph, "SAY %s", pPushMap->message);
 
 		/* reset the context */
 		xchat_set_context(ph, oldctx);
@@ -115,16 +118,21 @@ void xchat_plugin_get_info(char **name, char **desc, char **version, void **rese
   word[2] -> message
   word[3] -> mode sign
 */
-int message_cb(char* word[], void* userdata)
+void handle_message(char* word[], CHAT_ACTION action)
 {
 	if (message_in_watched_channel())
 	{
 		char* stripped = xchat_strip(ph, word[2], -1, 1 | 2);
 		if (stripped)
 		{
+			/* get the channel name */
+			const char *channelname = xchat_get_info(ph, "channel");
+
 			/* add the message at the end of the queue */
 			SMSDataStruct message;
+			message.action = (char) action;
 			sprintf_s(message.user, "%s%s", word[3], word[1]);
+			strcpy_s(message.channel, channelname);
 			strcpy_s(message.message, stripped);
 
 			pending.push(message);
@@ -136,6 +144,16 @@ int message_cb(char* word[], void* userdata)
 			xchat_free(ph, stripped);
 		}
 	}
+}
+int message_cb(char* word[], void* userdata)
+{
+	handle_message(word, ACTION_SAY);
+	return XCHAT_EAT_NONE;
+}
+
+int action_cb(char* word[], void* userdata)
+{
+	handle_message(word, ACTION_ME);
 	return XCHAT_EAT_NONE;
 }
 
@@ -192,7 +210,12 @@ int xchat_plugin_init(xchat_plugin *plugin_handle,
 
 	/* make sure we save messages */
 	xchat_hook_print(ph, "Channel Message", XCHAT_PRI_NORM, message_cb, NULL);
+	xchat_hook_print(ph, "Channel Msg Hilight", XCHAT_PRI_NORM, message_cb, NULL);
 	xchat_hook_print(ph, "Your Message", XCHAT_PRI_NORM, message_cb, NULL);
+
+	xchat_hook_print(ph, "Channel Action", XCHAT_PRI_NORM, action_cb, NULL);
+	xchat_hook_print(ph, "Channel Action Hilight", XCHAT_PRI_NORM, action_cb, NULL);
+	xchat_hook_print(ph, "Your Action", XCHAT_PRI_NORM, action_cb, NULL);
 
 	/* just doing okay */
 	xchat_print(ph, PNAME " loaded successfully!");

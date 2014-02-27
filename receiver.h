@@ -7,7 +7,7 @@
 class Target
 {
 public:
-	virtual void OnMessage(std::string& username, std::string& text) = 0;
+	virtual void OnMessage(std::string& channel, std::string& username, std::string& text, CHAT_ACTION action) = 0;
 };
 
 class Receiver
@@ -66,7 +66,7 @@ public:
 			SMSDataStruct message;
 			memcpy(&message, (char*)pPollMap + i * sizeof(SMSDataStruct), sizeof(SMSDataStruct));
 
-			target->OnMessage(std::string(message.user), std::string(message.message));
+			target->OnMessage(std::string(message.channel), std::string(message.user), std::string(message.message), (CHAT_ACTION) message.action);
 		}
 
 		UnmapViewOfFile(pPollMap);
@@ -86,7 +86,9 @@ public:
 			return false;
 
 		SMSDataStruct* pPushMap = (SMSDataStruct*)MapViewOfFile(hPushMapping, FILE_MAP_WRITE, 0, 0, 0);
-		strcpy_s(pPushMap->user, MAX_USER_LENGTH, channel.c_str());
+		pPushMap->action = (char) ACTION_SAY;
+		pPushMap->user[0] = 0;
+		strcpy_s(pPushMap->channel, MAX_USER_LENGTH, channel.c_str());
 		strcpy_s(pPushMap->message, MAX_MESSAGE_LENGTH, text.c_str());
 
 		LRESULT value = SendMessage(hWnd, WM_PUSH, 0, 0);

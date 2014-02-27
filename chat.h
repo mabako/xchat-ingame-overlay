@@ -70,9 +70,13 @@ public:
 		}
 	}
 
-	void OnMessage(std::string& username, std::string& message)
+	void OnMessage(std::string& channel, std::string& username, std::string& message, CHAT_ACTION action)
 	{
-		messages.push_back(username + ": " + message);
+		if (action == ACTION_ME)
+			messages.push_back(channel + "** " + username + " " + message);
+		else if (action == ACTION_SAY)
+			messages.push_back(channel + "> " + username + ": " + message);
+
 		if (messages.size() > POLL_QUEUE_SIZE)
 			messages.pop_front();
 	}
